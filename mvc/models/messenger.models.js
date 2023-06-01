@@ -49,20 +49,33 @@ getPritaveMessenger = (myid, idrsend, callback) => {
 
 checkChatPrivate = (myid, idreceiver, callback) => {
   pool.query(
-    "select  messangers.idconversations from messangers where (idusersend=? or iduserget=?) and (idusersend=? or iduserget=?) limit 1",
+    " select idconversations from conversations   where (idusersend=? or iduserget=?) and (idusersend=? or iduserget=?) limit 1;",
     [myid, myid, idreceiver, idreceiver],
     (err, results) => {
       if (err) return callback(500);
+
+      callback(results);
+    }
+  );
+};
+//tạo id conversation
+creatIdconversation = (myid, idreceiver, callback) => {
+  pool.query(
+    "INSERT INTO `conversations` (`idusersend`, `iduserget`) SELECT ?, ? WHERE NOT EXISTS ( SELECT * FROM `conversations` WHERE (`idusersend` = ? or `idusersend` = ?) AND (`iduserget` = ? or `iduserget` = ?)  );",
+    [myid, idreceiver, myid, idreceiver, myid, idreceiver],
+    (err, results) => {
+      if (err) return callback(500);
+
       callback(results);
     }
   );
 };
 
-// tạo danh sách chat
-chat = (myid, idsend, content, idconversation, callback) => {
+// tạo tin nhắn
+creatChatPrivate = (myid, idreceiver, content, idconversation, callback) => {
   pool.query(
     "INSERT INTO `messangers` ( `idusersend`,  `msgtext`, `timesend`, `idconversations`,`iduserget`) VALUES ( ?,  ?, ?, ?,?);",
-    [myid, content, dateTime, idsend, idconversation],
+    [myid, content, dateTime, idconversation, idreceiver],
     (err, results) => {
       if (err) return callback(500);
 
@@ -88,4 +101,6 @@ module.exports = {
   getListDataUserChat,
   getPritaveMessenger,
   checkChatPrivate,
+  creatIdconversation,
+  creatChatPrivate,
 };
