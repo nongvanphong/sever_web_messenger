@@ -1,10 +1,5 @@
 const pool = require("../../config");
-let today = new Date();
-let date =
-  today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-let time =
-  today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-let dateTime = date + " " + time;
+const cratedate = require("../modules/createdate.modules");
 
 searUserChat = (textsearch, callback) => {
   const searchTerm = "%" + textsearch + "%";
@@ -75,7 +70,7 @@ creatIdconversation = (myid, idreceiver, callback) => {
 creatChatPrivate = (myid, idreceiver, content, idconversation, callback) => {
   pool.query(
     "INSERT INTO `messangers` ( `idusersend`,  `msgtext`, `timesend`, `idconversations`,`iduserget`) VALUES ( ?,  ?, ?, ?,?);",
-    [myid, content, dateTime, idconversation, idreceiver],
+    [myid, content, cratedate.createDate(), idconversation, idreceiver],
     (err, results) => {
       if (err) return callback(500);
 

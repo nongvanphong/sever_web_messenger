@@ -57,7 +57,7 @@ module.exports = (app) => {
   // hàm insert tin nhắn vào sql
   app.post("/insert-private-messenge", (req, res) => {
     const { myid, idreceiver, content, idconversation } = req.body;
-    console.log(myid, idreceiver, content, idconversation);
+
     model.creatChatPrivate(
       myid,
       idreceiver,
@@ -66,6 +66,8 @@ module.exports = (app) => {
       function (results) {
         if (results === 500)
           return res.status(500).send("máy chử không truy cập được");
+
+        return res.status(200).send("ok");
       }
     );
   });
