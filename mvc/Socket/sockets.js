@@ -37,7 +37,13 @@ module.exports = (server) => {
 
   // đây là midlleware nếu không thành công thì người dùng không thể ra khỏ hàm này
   io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
+    let token;
+
+    if (socket.handshake.auth.token) {
+      token = socket.handshake.auth.token;
+    } else {
+      token = socket.handshake.headers.auth;
+    }
 
     const results = jwtveryfy(token);
 
@@ -93,9 +99,18 @@ const chatPrivate = (socket, io) => {
 
   // nhận giữ liệu từ người nhận
   socket.on("private message", ({ content, to }) => {
-    socket.to(to).emit("private message", {
-      content,
-      from: socket.id,
-    });
+    console.log(content, to);
+
+    const idreceiver = connections.find((i) => i.iduser == to);
+
+    try {
+      console.log("->", idreceiver.idsoket);
+      socket.to(idreceiver.idsoket).emit("private message", {
+        content,
+        from: socket.id,
+      });
+    } catch (error) {
+      console.error("người dũng đã offline");
+    }
   });
 };
