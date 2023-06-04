@@ -1,7 +1,7 @@
 const model = require("../models/messenger.models");
 var validator = require("../../validate");
 const auth = require("../middleware/auth.login.middleware");
-
+const dotenv = require("dotenv").config({ path: "process.env" });
 module.exports = (app) => {
   app.post("/search-messenger-users", (req, res) => {
     const { search } = req.body;
@@ -9,7 +9,29 @@ module.exports = (app) => {
     model.searUserChat(search, function (results) {
       if (results === 500)
         return res.status(500).send("máy chử không truy cập được");
-
+      // Lặp qua mảng và thực hiện các thay đổi
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].img) {
+          results[i].img =
+            "http://" +
+            dotenv.parsed.HOST +
+            ":" +
+            dotenv.parsed.PORT +
+            "/" +
+            dotenv.parsed.PARTIMG +
+            "/" +
+            results[i].img;
+        } else {
+          results[i].img =
+            "http://" +
+            dotenv.parsed.HOST +
+            ":" +
+            dotenv.parsed.PORT +
+            "/" +
+            dotenv.parsed.PARTIMG +
+            "/null.png";
+        }
+      }
       res.status(200).json(results);
     });
   });
@@ -19,6 +41,53 @@ module.exports = (app) => {
     model.getListDataUserChat(myid, function (results) {
       if (results === 500)
         return res.status(500).send("máy chử không truy cập được");
+
+      // Lặp qua mảng và thực hiện các thay đổi
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].img1) {
+          results[i].img1 =
+            "http://" +
+            dotenv.parsed.HOST +
+            ":" +
+            dotenv.parsed.PORT +
+            "/" +
+            dotenv.parsed.PARTIMG +
+            "/" +
+            results[i].img1;
+        } else {
+          results[i].img1 =
+            "http://" +
+            dotenv.parsed.HOST +
+            ":" +
+            dotenv.parsed.PORT +
+            "/" +
+            dotenv.parsed.PARTIMG +
+            "/null.png";
+        }
+
+        if (results[i].img2) {
+          results[i].img2 =
+            "http://" +
+            dotenv.parsed.HOST +
+            ":" +
+            dotenv.parsed.PORT +
+            "/" +
+            dotenv.parsed.PARTIMG +
+            "/" +
+            results[i].img2;
+        } else {
+          results[i].img2 =
+            "http://" +
+            dotenv.parsed.HOST +
+            ":" +
+            dotenv.parsed.PORT +
+            "/" +
+            dotenv.parsed.PARTIMG +
+            "/null.png";
+        }
+      }
+
+      // Xuất kết quả
 
       res.status(200).json(results);
     });

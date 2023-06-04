@@ -57,33 +57,15 @@ module.exports = (server) => {
   // mang chưa danh sách user
 
   io.on("connection", (socket) => {
-    // lặp đẻ lấy ra các thông tyin ở trong soket
-    // io.sockets.sockets.forEach((socket) => {
-    //   connections.push({
-    //     iduser: socket.id,
-    //   });
-    // });
-    // for (let [id, socket] of io.of("/").sockets) {
-    //   console.log(id, socket.iduser);
-    //   if (socket.iduser) {
-    //     connections.push({
-    //       idsoket: id,
-    //       iduser: socket.iduser,
-    //     });
-    //   }
-    // }
     connections.push({
       idsoket: socket.id,
       iduser: socket.iduser,
     });
     //gửi thông tin các user về
     socket.emit("users", connections);
-
     console.log("số lượng người đang online", connections.length);
-
     // nhắn tin nhắn riêng
     chatPrivate(socket, io);
-
     socket.on("disconnect", () => {
       connections = connections.filter((item) => item.idsoket !== socket.id);
       console.log("số lượng người đang online", connections.length);
@@ -92,19 +74,15 @@ module.exports = (server) => {
 };
 
 const chatPrivate = (socket, io) => {
-  // thông boa khi có người nhắn tin
-  socket.broadcast.emit("notify private massage", {
-    userID: socket.id,
-  });
-
   // nhận giữ liệu từ người nhận
   socket.on("private message", ({ content, to }) => {
-    console.log(content, to);
-
     const idreceiver = connections.find((i) => i.iduser == to);
-
     try {
-      console.log("->", idreceiver.idsoket);
+      // thông boa khi có người nhắn tin
+      socket.to(idreceiver.idsoket).emit("notify private massage", {
+        content,
+        from: socket.iduser,
+      });
       socket.to(idreceiver.idsoket).emit("private message", {
         content,
         from: socket.id,

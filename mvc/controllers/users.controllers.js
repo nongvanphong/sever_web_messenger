@@ -22,7 +22,7 @@ const generateToken = (payload) => {
     expiresIn: "5h",
   });
 
-  return { acceptToken, refreshToken };
+  return { acceptToken, refreshToken, id };
 };
 
 // viết hàm tạo resfeshtoke khi hết hạn
