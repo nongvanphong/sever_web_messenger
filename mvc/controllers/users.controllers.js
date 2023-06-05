@@ -15,26 +15,14 @@ const key2 = dotenv.parsed.TOKENKEY2;
 const generateToken = (payload) => {
   const id = payload;
   const acceptToken = jwt.sign({ id }, key1, {
-    expiresIn: "5h",
+    expiresIn: "1h",
   });
   // tạo thêm 1 resfeshtoke
   const refreshToken = jwt.sign({ id }, key2, {
-    expiresIn: "5h",
+    expiresIn: 30 * 24 * 60 * 60, // để 1 tháng
   });
 
   return { acceptToken, refreshToken, id };
-};
-
-// viết hàm tạo resfeshtoke khi hết hạn
-const updateRefeshToke = (username, refeshtoken) => {
-  users = datauser.map((user) => {
-    if (user.name === username) {
-      // lấy ra toàn bô giá trị của user và chỉ update resfeshtoke
-
-      return (user.refeshtoken = refeshtoken);
-    }
-    return user;
-  });
 };
 
 module.exports = (app) => {

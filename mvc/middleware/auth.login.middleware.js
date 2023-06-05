@@ -19,6 +19,7 @@ const jwtveryfy = (req, res, next) => {
     cookies[name] = value;
   });
   const token = cookies.cookieAcceptToken;
+  const refreshToken = cookies.cookieRefreshToken;
   //const authheader = req.header("Authorization");
   // console.log(authheader);
   // lấy token ra và kiểm tra authheader có thì chúng ta sẽ cắt chuỗi
@@ -26,28 +27,51 @@ const jwtveryfy = (req, res, next) => {
 
   // nếu không có toke thì sẽ bão lỗi
   if (!token) {
-    return res.status(401).send({ message: "token sai hoạc không toonff tại" });
+    return res.status(401).send({ message: "token sai hoạc không tồn tại" });
   }
 
   // trả ra token
 
   try {
     const decoded = jwt.verify(token, KEY1);
-    // console.log(" => ", decoded.id);
-    // trả req
     req.iduser = decoded.id;
     next();
   } catch (error) {
-    res.status(403).send({ message: "không dịch được toek, token đã hết hạn" });
+    //  res.status(403).send({ message: "không dịch được toek, token đã hết hạn" });
+    const update = updateToke(refreshToken);
+
+    if (update == 403) {
+      return res
+        .status(403)
+        .send({ message: "không dịch được toek, token đã hết hạn" });
+    } else {
+      return res.status(201).json({ acceptToken: update });
+    }
   }
 };
 
-// hàm kiểm tra token có đượng gửi lkeen không
-const checkToken = (token) => {
-  if (!token) return false;
-  return true;
-};
+// viết hàm tạo updateToke khi hết hạn
+const updateToke = (refeshtoken) => {
+  if (!refeshtoken) {
+    return res
+      .status(401)
+      .send({ message: "refreshtoken sai hoạc không tồn tại" });
+  }
+  try {
+    const decoded = jwt.verify(refeshtoken, KEY2);
+    // req.iduser = decoded.id;
+    const id = decoded.id;
 
+    // cấp lại token
+    const acceptToken = jwt.sign({ id }, KEY1, {
+      expiresIn: "1h",
+    });
+
+    return acceptToken;
+  } catch (error) {
+    return 403;
+  }
+};
 module.exports = {
   jwtveryfy,
 };

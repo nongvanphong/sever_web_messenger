@@ -77,6 +77,7 @@ const chatPrivate = (socket, io) => {
   // nhận giữ liệu từ người nhận
   socket.on("private message", ({ content, to }) => {
     const idreceiver = connections.find((i) => i.iduser == to);
+
     try {
       // thông boa khi có người nhắn tin
       socket.to(idreceiver.idsoket).emit("notify private massage", {
